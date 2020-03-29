@@ -12,8 +12,8 @@ public class AllMeshRendererSetter : EditorWindow
 {
 	// 設定可能な項目
 	private static GameObject _parentObject;
-	private static GameObject _rootBone; 
-	private static GameObject _anchor;
+	private static Transform _rootBone; 
+	private static Transform _anchor;
 	private static Bounds _bounds = new Bounds(Vector3.zero, Vector3.one * 2);
 	
 	// レンダラーがついているオブジェクトリスト
@@ -26,6 +26,12 @@ public class AllMeshRendererSetter : EditorWindow
 		// 右クリックした要素を設定
 		_parentObject = Selection.activeGameObject;
 		
+		Animator anime = _parentObject.GetComponent<Animator>();
+		if(anime)
+		{
+			_rootBone = anime.GetBoneTransform(HumanBodyBones.Hips);
+			_anchor = anime.GetBoneTransform(HumanBodyBones.Chest);
+		}
 		EditorWindow.GetWindow (typeof (AllMeshRendererSetter));
 	}
 	
@@ -39,11 +45,11 @@ public class AllMeshRendererSetter : EditorWindow
 		EditorGUILayout.EndHorizontal();
 		
 		EditorGUILayout.BeginHorizontal();	// RootBone
-		_rootBone = (GameObject)EditorGUILayout.ObjectField("Root Bone(Hip)", _rootBone, typeof(GameObject), true);
+		_rootBone = (Transform)EditorGUILayout.ObjectField("Root Bone(Hip)", _rootBone, typeof(Transform), true);
 		EditorGUILayout.EndHorizontal();
 		
 		EditorGUILayout.BeginHorizontal();	// Prove Anchor
-		_anchor = (GameObject)EditorGUILayout.ObjectField("Prove Anchor(Chest)", _anchor, typeof(GameObject), true);
+		_anchor = (Transform)EditorGUILayout.ObjectField("Prove Anchor(Chest)", _anchor, typeof(Transform), true);
 		EditorGUILayout.EndHorizontal();
 		
 		EditorGUILayout.BeginHorizontal();	// Bounds
@@ -90,9 +96,9 @@ public class AllMeshRendererSetter : EditorWindow
 			transform.localRotation = Quaternion.identity;
 			transform.localScale    = Vector3.one;
 			
-			skinnedMesh.rootBone = _rootBone.transform;
+			skinnedMesh.rootBone = _rootBone;
 			skinnedMesh.localBounds = _bounds;
-			skinnedMesh.probeAnchor = _anchor.transform;
+			skinnedMesh.probeAnchor = _anchor;
 
 		}
 		foreach(GameObject obj in _meshObjects)
